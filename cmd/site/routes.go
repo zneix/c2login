@@ -50,14 +50,29 @@ func code(w http.ResponseWriter, r *http.Request) {
 	// Requesting token was unsuccessful
 	if resp.StatusCode != http.StatusOK {
 		w.WriteHeader(resp.StatusCode)
-		w.Write([]byte(fmt.Sprintf("Something went wrong, %d", resp.StatusCode)))
+		w.Write([]byte(fmt.Sprintf("Something went wrong while requesting access token, %d", resp.StatusCode)))
 		return
 	}
 
-	// TODO: Get details about user tied to the token
+	// Get details about user tied to the token
+	userClient, err := helix.NewClient(&helix.Options{
+		ClientID:        clientID,
+		UserAccessToken: resp.Data.AccessToken,
+	})
+
+	userResp, err := userClient.GetUsers(&helix.UsersParams{})
+	if err != nil {
+		log.Printf("Error while requesting user details: %v\n", err)
+
+		w.WriteHeader(userResp.StatusCode)
+		w.Write([]byte(fmt.Sprintf("Something went wrong while requesting user details, %d", userResp.StatusCode)))
+		return
+	}
+
+	user := userResp.Data.Users[0]
 
 	// Success
-	accountData := fmt.Sprintf("oauth_token=%s;refresh_token=%s;username=%s;user_id=%s;client_id=%s", resp.Data.AccessToken, resp.Data.RefreshToken, "...", "...", clientID)
+	accountData := fmt.Sprintf("oauth_token=%s;refresh_token=%s;username=%s;user_id=%s;client_id=%s", resp.Data.AccessToken, resp.Data.RefreshToken, user.Login, user.ID, clientID)
 	w.Write([]byte(accountData))
 }
 
