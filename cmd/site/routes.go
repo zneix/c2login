@@ -18,16 +18,18 @@ var (
 	redirectURI string
 )
 
+// index page - user authentication
 func index(w http.ResponseWriter, r *http.Request) {
 	// "code" is required for us to receive code instead of token
 	const responseType = "code"
 	encodedScopes := url.PathEscape(strings.Join(scopes, " "))
 
-	link := fmt.Sprintf("<a href=\"https://id.twitch.tv/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s\">login</a>", clientID, redirectURI, responseType, encodedScopes)
+	link := fmt.Sprintf("https://id.twitch.tv/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&force_verify=true", clientID, redirectURI, responseType, encodedScopes)
 
-	w.Write([]byte(link))
+	http.Redirect(w, r, link, http.StatusFound)
 }
 
+// code page - callback called by Twitch, where we process Twitch's request and redirect to the final page
 func code(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 
@@ -54,25 +56,11 @@ func code(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get details about user tied to the token
-	userClient, err := helix.NewClient(&helix.Options{
-		ClientID:        clientID,
-		UserAccessToken: resp.Data.AccessToken,
-	})
-
-	userResp, err := userClient.GetUsers(&helix.UsersParams{})
-	if err != nil {
-		log.Printf("Error while requesting user details: %v\n", err)
-
-		w.WriteHeader(userResp.StatusCode)
-		w.Write([]byte(fmt.Sprintf("Something went wrong while requesting user details, %d", userResp.StatusCode)))
-		return
-	}
-
-	user := userResp.Data.Users[0]
+	// Validate obtained token for extra data (no way it can be invalid)
+	_, validResp, err := APIClient.ValidateToken(resp.Data.AccessToken)
 
 	// Success
-	accountData := fmt.Sprintf("oauth_token=%s;refresh_token=%s;username=%s;user_id=%s;client_id=%s", resp.Data.AccessToken, resp.Data.RefreshToken, user.Login, user.ID, clientID)
+	accountData := fmt.Sprintf("oauth_token=%s;refresh_token=%s;username=%s;user_id=%s;client_id=%s", resp.Data.AccessToken, resp.Data.RefreshToken, validResp.Data.Login, validResp.Data.UserID, validResp.Data.ClientID)
 	w.Write([]byte(accountData))
 }
 
