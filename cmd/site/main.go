@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/zneix/c2login/pkg/config"
+	"github.com/zneix/c2login/pkg/twitchapiclient"
 )
 
 var (
@@ -60,6 +61,11 @@ func main() {
 	cfg := config.New()
 	router := chi.NewRouter()
 
-	handleMainRoutes(router, cfg)
+	helixClient, err := twitchapiclient.New(cfg, httpClient)
+	if err != nil {
+		log.Fatalf("[Twitch] Error initializing new client: %v\n", err)
+	}
+
+	handleMainRoutes(router, helixClient, cfg)
 	listen(cfg.BindAddress, mountRouter(router, cfg))
 }

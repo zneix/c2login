@@ -1,2 +1,4 @@
 github.com/go-chi/chi/v5 v5.0.3 h1:khYQBdPivkYG1s1TAzDQG1f6eX4kD2TItYVZexL5rS4=
 github.com/go-chi/chi/v5 v5.0.3/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
+github.com/nicklaw5/helix v1.24.0 h1:GhZc6a1OSI7s6fnX5mZKP14kS4g+o/7SAakfCnfIfTI=
+github.com/nicklaw5/helix v1.24.0/go.mod h1:XeeXY7oY5W+MVMu6wF4qGm8uvjZ1/Nss0FqprVkXKrg=
