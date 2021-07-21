@@ -1,0 +1,6 @@
+*.exe
+*.test
+*.out
+
+cached/
+cmd/site/site
