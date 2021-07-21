@@ -1,0 +1,18 @@
+[Unit]
+Description=Chatterino2 Authentication Site
+Requires=nginx.service
+After=nginx.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/c2login
+ExecStart=/opt/c2login/cmd/site/site
+Restart=always
+Environment="C2LOGIN_BASE_URL="
+Environment="C2LOGIN_BIND_ADDRESS=:1234"
+Environment="C2LOGIN_CLIENT_ID="
+Environment="C2LOGIN_CLIENT_SECRET="
+Environment="C2LOGIN_REDIRECT_URI="
+
+[Install]
+WantedBy=multi-user.target
