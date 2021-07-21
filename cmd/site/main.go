@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/zneix/c2login/pkg/config"
 )
 
@@ -60,9 +59,6 @@ func listen(bind string, router *chi.Mux) {
 func main() {
 	cfg := config.New()
 	router := chi.NewRouter()
-
-	// Strip trailing slashes from API requests
-	router.Use(middleware.StripSlashes)
 
 	handleMainRoutes(router, cfg)
 	listen(cfg.BindAddress, mountRouter(router, cfg))

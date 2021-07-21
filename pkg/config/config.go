@@ -15,14 +15,21 @@ var (
 )
 
 type SiteConfig struct {
+	// Core
+
 	// Base URL which is meant to be the root endpoint of the site accessible from outside
 	BaseURL string `key:"base-url"`
 	// Address on which application will be listening, localhost
 	BindAddress string `key:"bind-address"`
-	// Twitch client secret used for obtaining tokens from received codes
-	ClientSecret string `key:"client-secret"`
+
+	// Secrets
+
 	// Twitch client id used to identify the client secret
 	ClientID string `key:"client-id"`
+	// Twitch client secret used for obtaining tokens from received codes
+	ClientSecret string `key:"client-secret"`
+	// Redirect URI to which Twitch will send us the code after user successfully authenticates
+	RedirectURI string `key:"redirect-uri"`
 }
 
 func getEnv(envSuffix string) (value string, exists bool) {
