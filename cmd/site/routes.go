@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -60,8 +61,17 @@ func code(w http.ResponseWriter, r *http.Request) {
 	_, validResp, err := APIClient.ValidateToken(resp.Data.AccessToken)
 
 	// Success
-	accountData := fmt.Sprintf("oauth_token=%s;refresh_token=%s;username=%s;user_id=%s;client_id=%s", resp.Data.AccessToken, resp.Data.RefreshToken, validResp.Data.Login, validResp.Data.UserID, validResp.Data.ClientID)
-	w.Write([]byte(accountData))
+	payloadData := chatterinoLoginPayload{
+		ClientID:     validResp.Data.ClientID,
+		OauthToken:   resp.Data.AccessToken,
+		RefreshToken: resp.Data.RefreshToken,
+		UserID:       validResp.Data.UserID,
+		Username:     validResp.Data.Login,
+	}
+	payload, err := json.Marshal(payloadData)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(payload))
 }
 
 func handleMainRoutes(router *chi.Mux, helixClient *helix.Client, cfg config.SiteConfig) {
